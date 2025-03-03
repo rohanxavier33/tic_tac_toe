@@ -30,6 +30,14 @@ class TicTacToe():
                 self.current_winner = letter
             return True
         return False
+    
+    def copy(self):
+        new_game = TicTacToe()
+        new_game.board = self.board.copy()
+        new_game.current_winner = self.current_winner
+        if hasattr(self, 'winning_combination'):
+            new_game.winning_combination = self.winning_combination.copy()
+        return new_game
 
     def winner(self, square, letter):
         row_ind = math.floor(square / 3)

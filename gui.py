@@ -131,27 +131,6 @@ class DarkTicTacToe:
         for idx in self.game.available_moves():
             self.buttons[idx].config(state=state)
 
-    def handle_computer_move(self):
-        if self.game.current_winner or not self.game.empty_squares():
-            return
-        
-        self.status_label.config(text="AI is thinking")
-        self.animate_thinking()
-        self.toggle_buttons(False)
-        
-        self.root.update()
-        time.sleep(0.5)
-        
-        square = self.current_player.get_move(self.game)
-        if self.game.make_move(square, self.current_player.letter):
-            self.update_board()
-            self.check_game_end()
-            
-            if not self.game.current_winner and self.game.empty_squares():
-                self.current_player = self.o_player
-                self.status_label.config(text="Your Turn")
-                self.toggle_buttons(True)
-                self.thinking_dots.config(text="")
 
     def on_human_move(self, square):
         if self.current_player != self.o_player or self.game.board[square] != ' ':
@@ -213,6 +192,26 @@ class DarkTicTacToe:
     def show_game_over(self, message):
         messagebox.showinfo("Game Over", message)
         self.root.destroy()
+    
+    def handle_computer_move(self):
+        if self.game.current_winner or not self.game.empty_squares():
+            return
+
+        self.status_label.config(text="AI is thinking")
+        self.animate_thinking()
+        self.toggle_buttons(False)
+        self.root.after(500, self.process_computer_move)
+
+    def process_computer_move(self):
+        square = self.current_player.get_move(self.game)
+        if self.game.make_move(square, self.current_player.letter):
+            self.update_board()
+            self.check_game_end()
+            if not self.game.current_winner and self.game.empty_squares():
+                self.current_player = self.o_player
+                self.status_label.config(text="Your Turn")
+                self.toggle_buttons(True)
+                self.thinking_dots.config(text="")
 
 if __name__ == "__main__":
     DarkTicTacToe()
