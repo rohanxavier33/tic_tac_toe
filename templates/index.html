@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Tic Tac Toe</title>
+    <style>
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+            width: 310px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: pointer;
+            background: #fff;
+            transition: background 0.3s;
+        }
+        .cell:hover {
+            background: #f0f0f0;
+        }
+        .status {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status" id="status">Your Turn (O)</div>
+    <div class="game-board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <script>
+        const cells = document.querySelectorAll('.cell');
+        const status = document.getElementById('status');
+        
+        cells.forEach(cell => {
+            cell.addEventListener('click', async (e) => {
+                if (!e.target.textContent && !status.textContent.includes('Wins')) {
+                    const index = e.target.dataset.index;
+                    const response = await fetch('/move', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ position: index })
+                    });
+                    
+                    const gameState = await response.json();
+                    updateBoard(gameState.board);
+                    
+                    if (gameState.winner) {
+                        status.textContent = `${gameState.winner} Wins!`;
+                    } else if (gameState.game_over) {
+                        status.textContent = "It's a Tie!";
+                    }
+                }
+            });
+        });
+
+        function updateBoard(board) {
+            cells.forEach((cell, index) => {
+                cell.textContent = board[index];
+                cell.style.color = board[index] === 'X' ? '#333' : '#E74C3C';
+            });
+        }
+    </script>
+</body>
+</html>
